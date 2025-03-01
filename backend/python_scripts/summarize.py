@@ -1,22 +1,21 @@
 from flask import Flask, request, jsonify
-from flask_cors import CORS  # Allow frontend requests
-import fitz  # PyMuPDF for PDF text extraction
-import docx  # python-docx for DOCX files
+from flask_cors import CORS
+import fitz
+import docx
 import os
 import time
-import requests  # Fetch PDFs from URLs
+import requests
 from transformers import pipeline
-from concurrent.futures import ThreadPoolExecutor
+import re
 
-app = Flask(__name__)
-CORS(app)  # Enable CORS for frontend communication
+app = Flask(_name_)
+CORS(app)
 
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# ✅ Load summarization model once at startup
 try:
-    summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
+    summarizer = pipeline("summarization", model="facebook/bart-large-cnn", device=0)
 except Exception as e:
     print(f"Error loading model: {str(e)}")
     summarizer = None
@@ -68,6 +67,7 @@ def summarize_document():
             return jsonify({"error": "Summarization model failed to load."}), 500
 
         summary = summarize_text(chunks, summarizer, length)
+        summary = refine_summary(summary) #added refine summary to fix colon issue.
         processing_time = round(time.time() - start_time, 2)
 
         print(f"✅ Summary generated in {processing_time} seconds")
@@ -79,16 +79,13 @@ def summarize_document():
             "num_chunks_processed": len(chunks),
             "processing_time_sec": processing_time,
         })
-
     except Exception as e:
-        print(f"❌ ERROR: {str(e)}")  # Debugging
+        print(f"❌ ERROR: {str(e)}")
         return jsonify({"error": f"Unexpected server error: {str(e)}"}), 500
 
-
 def download_pdf_from_url(pdf_url):
-    """Fetch a PDF from a URL and save it locally."""
     try:
-        response = requests.get(pdf_url)
+        response = requests.get(pdf_url, timeout=10)
         if response.status_code != 200:
             return None
         file_path = "temp_policy.pdf"
@@ -100,7 +97,6 @@ def download_pdf_from_url(pdf_url):
         return None
 
 def extract_text(file_path):
-    """Extracts text from PDF, DOCX, or TXT files."""
     if file_path.endswith(".pdf"):
         return extract_text_from_pdf(file_path)
     elif file_path.endswith(".docx"):
@@ -110,40 +106,59 @@ def extract_text(file_path):
     return "Unsupported file format."
 
 def extract_text_from_pdf(file_path):
-    """Extract text from a PDF file."""
-    text = ""
-    doc = fitz.open(file_path)
-    for page in doc:
-        text += page.get_text("text") + "\n"
-    return text.strip()
+    try:
+        with fitz.open(file_path) as doc:
+            text = "".join(page.get_text("text") for page in doc)
+        return text.strip()
+    except Exception as e:
+        print(f"Error extracting PDF text: {e}")
+        return ""
 
 def extract_text_from_docx(file_path):
-    """Extract text from a DOCX file."""
-    doc = docx.Document(file_path)
-    return "\n".join([para.text for para in doc.paragraphs]).strip()
+    try:
+        doc = docx.Document(file_path)
+        text = "\n".join(paragraph.text for paragraph in doc.paragraphs)
+        return text.strip()
+    except Exception as e:
+        print(f"Error extracting DOCX text: {e}")
+        return ""
 
 def extract_text_from_txt(file_path):
-    """Extract text from a TXT file."""
-    with open(file_path, "r", encoding="utf-8") as f:
-        return f.read().strip()
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            return f.read().strip()
+    except Exception as e:
+        print(f"Error extracting TXT text: {e}")
+        return ""
 
-def chunk_text(extracted_text, max_tokens=500):
-    """Splits text into smaller chunks for model processing."""
+def chunk_text(extracted_text, max_tokens=700):
     tokens = extracted_text.split()
     return [" ".join(tokens[i : i + max_tokens]) for i in range(0, len(tokens), max_tokens)]
 
 def summarize_text(chunks, summarizer, length):
-    """Summarizes text chunks."""
     if not summarizer:
         return "Summarization model not available."
 
-    length_mapping = {"short": (50, 10), "medium": (100, 50), "long": (200, 100)}
+    length_mapping = {"short": (70, 30), "medium": (150, 75), "long": (300, 150)}
     max_length, min_length = length_mapping[length]
 
-    with ThreadPoolExecutor() as executor:
-        summaries = list(executor.map(lambda chunk: summarizer(chunk, max_length=max_length, min_length=min_length, do_sample=False)[0]["summary_text"], chunks))
+    summaries = summarizer(chunks, max_length=max_length, min_length=min_length, do_sample=False, truncation=True)
+    return " ".join([s["summary_text"] for s in summaries]).strip()
 
-    return " ".join(summaries).strip()
+def refine_summary(summary):
+    summary = re.sub(r'\s+:\s+', ': ', summary)
+    summary = re.sub(r'\s+', ' ', summary).strip()
+    summary = re.sub(r'([.!?])([A-Z])', r'\1 \2', summary)
+    summary = re.sub(r'([.!?])([a-z])', r'\1 \2', summary)
+    summary = summary.replace(" .", ".").replace(" ,", ",")
+    summary = summary.replace(" :", ":")
+    summary = summary.replace(": ", ":")
+    summary = summary.replace(":", ": ")
+    summary = re.sub(r':\s*([.!?])', r'\1', summary)
+    summary = re.sub(r':([^ ])', r'\1', summary)
+    if summary:
+        summary = summary[0].upper() + summary[1:]
+    return summary
 
-if __name__ == "__main__":
+if _name_ == "_main_":
     app.run(host="0.0.0.0", port=5000, debug=True)
