@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
+import ChatbotButton from "../ChatBot/ChatbotButton";
+import ChatbotUI from "../ChatBot/ChatbotUI";
 
 const PolicyDetails = () => {
   const { id } = useParams();
@@ -21,6 +23,27 @@ const PolicyDetails = () => {
   const [copied, setCopied] = useState(false);
   const handleComplaintClick = () => {
     navigate(`/complaints`);
+  };
+  const [isChatOpen, setIsChatOpen] = useState(false);
+const toggleChat =async () => {
+    setIsChatOpen(!isChatOpen);
+    if (!pdfUrl) {
+      setError("No policy document available.");
+      return;
+    }
+    const BASE_URL = "http://localhost:5173";  
+    const fullPdfUrl = pdfUrl.startsWith("http") ? pdfUrl : `${BASE_URL}${pdfUrl}`;
+
+    console.log("📤 Sending request with PDF URL:", fullPdfUrl);
+
+    const formData = new FormData();
+    formData.append("pdf_url", fullPdfUrl);
+
+
+    const response = await axios.post("http://127.0.0.1:5000/upload", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    console.log(response.data);
   };
   // Simulate progress during loading
   useEffect(() => {
@@ -376,6 +399,8 @@ const PolicyDetails = () => {
             )}
           </div>
         </div>
+        <ChatbotButton onClick={toggleChat} isOpen={isChatOpen} />
+        <ChatbotUI isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
       </main>
     </div>
   );

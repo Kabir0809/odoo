@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, X } from 'lucide-react';
+import axios from 'axios';
 
 const ChatbotUI = ({ isOpen, onClose }) => {
   const [messages, setMessages] = useState([
@@ -19,7 +20,7 @@ const ChatbotUI = ({ isOpen, onClose }) => {
     }
   }, [messages, isOpen]);
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (inputValue.trim() === '') return;
     
     // Add user message
@@ -31,30 +32,29 @@ const ChatbotUI = ({ isOpen, onClose }) => {
     
     setMessages([...messages, newMessage]);
     setInputValue('');
-    
-    // Simulate bot response
-    setTimeout(() => {
-      let botResponse = {
+
+    try {
+      // Send question to Flask API
+      const response = await axios.post('http://127.0.0.1:5000/ask', { question: inputValue });
+      
+      // Add bot response to the chat
+      const botResponse = {
         id: messages.length + 2,
-        sender: 'bot'
+        sender: 'bot',
+        text: response.data.answer || "Sorry, I couldn't understand that."
       };
       
-      // Simple response logic based on keywords
-      const input = inputValue.toLowerCase();
-      if (input.includes('election') || input.includes('vote')) {
-        botResponse.text = 'Local elections are scheduled for July 4, 2025. You can check voter registration status on our website.';
-      } else if (input.includes('meeting') || input.includes('council')) {
-        botResponse.text = 'The next City Council meeting is on March 15, 2025. The Budget Planning Session is on March 20, 2025.';
-      } else if (input.includes('policy') || input.includes('waste') || input.includes('tax') || input.includes('park') || input.includes('traffic') || input.includes('solar')) {
-        botResponse.text = 'We have several recent policy updates. You can find details in the Recent Policies section on our dashboard.';
-      } else if (input.includes('hello') || input.includes('hi')) {
-        botResponse.text = 'Hello! How can I assist you with CivicBridge today?';
-      } else {
-        botResponse.text = "I'm not sure I understand. Could you please rephrase your question about local government services?";
-      }
-      
       setMessages(prev => [...prev, botResponse]);
-    }, 1000);
+
+    } catch (error) {
+      console.error("Error fetching the answer from the bot:", error);
+      const botResponse = {
+        id: messages.length + 2,
+        sender: 'bot',
+        text: "There was an issue connecting to the service. Please try again later."
+      };
+      setMessages(prev => [...prev, botResponse]);
+    }
   };
 
   const handleKeyPress = (e) => {
@@ -80,11 +80,7 @@ const ChatbotUI = ({ isOpen, onClose }) => {
         {messages.map((message) => (
           <div 
             key={message.id} 
-            className={`mb-3 max-w-[80%] p-2 rounded-lg ${
-              message.sender === 'user' 
-                ? 'bg-gray-100 ml-auto rounded-tr-none' 
-                : 'bg-gray-100 rounded-tl-none'
-            }`}
+            className={`mb-3 max-w-[80%] p-2 rounded-lg ${message.sender === 'user' ? 'bg-gray-100 ml-auto rounded-tr-none' : 'bg-gray-100 rounded-tl-none'}`}
           >
             {message.text}
           </div>

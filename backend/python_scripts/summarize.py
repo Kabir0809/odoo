@@ -8,7 +8,7 @@ import requests
 from transformers import pipeline
 import re
 
-app = Flask(_name_)
+app = Flask(__name__)
 CORS(app)
 
 UPLOAD_FOLDER = "uploads"
@@ -160,5 +160,5 @@ def refine_summary(summary):
         summary = summary[0].upper() + summary[1:]
     return summary
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)

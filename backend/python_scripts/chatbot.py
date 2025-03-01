@@ -8,9 +8,12 @@ from langchain.embeddings import OpenAIEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.document_loaders import PyPDFLoader, Docx2txtLoader, TextLoader
 from sentence_transformers import SentenceTransformer
+from flask_cors import CORS  # Import CORS
+import requests
 
 # Initialize Flask
 app = Flask(__name__)
+CORS(app)
 app.config["UPLOAD_FOLDER"] = "uploads"
 os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 
@@ -25,6 +28,20 @@ embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
 documents = []
 embeddings = None
 index = None
+
+# Function to download PDF from URL
+def download_pdf_from_url(pdf_url):
+    try:
+        response = requests.get(pdf_url, timeout=10)
+        if response.status_code != 200:
+            return None
+        file_path = "temp_policy.pdf"
+        with open(file_path, "wb") as f:
+            f.write(response.content)
+        return file_path
+    except Exception as e:
+        print(f"Error downloading PDF: {str(e)}")
+        return None
 
 # Function to extract text from uploaded files
 def extract_text(file_path):
@@ -51,25 +68,32 @@ def create_faiss_index(text_chunks):
     index.add(embedding_vectors)
     return index
 
-# API to upload documents
+# API to upload documents or handle PDF URL
 @app.route("/upload", methods=["POST"])
 def upload_document():
     global index
-    if "file" not in request.files:
-        return jsonify({"error": "No file part"})
-    
-    file = request.files["file"]
-    if file.filename == "":
-        return jsonify({"error": "No selected file"})
+    # Check if PDF URL or file is provided
+    pdf_url = request.form.get("pdf_url")
+    if pdf_url:
+        file_path = download_pdf_from_url(pdf_url)
+        if not file_path or not os.path.exists(file_path):
+            return jsonify({"error": "Failed to download PDF from URL"}), 400
+    else:
+        if "file" not in request.files:
+            return jsonify({"error": "No file part"}), 400
+        
+        file = request.files["file"]
+        if file.filename == "":
+            return jsonify({"error": "No selected file"}), 400
 
-    filename = secure_filename(file.filename)
-    file_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
-    file.save(file_path)
+        filename = secure_filename(file.filename)
+        file_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+        file.save(file_path)
 
-    # Extract text
+    # Extract text from the file (either from URL or uploaded file)
     extracted_data = extract_text(file_path)
     if not extracted_data:
-        return jsonify({"error": "Unsupported file format"})
+        return jsonify({"error": "Unsupported file format"}), 400
     
     # Split text into chunks
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
@@ -109,7 +133,7 @@ def ask_question():
     # Generate response using Cohere
     response = co.generate(
         model="command-r-plus-08-2024",
-        prompt=f"Context: {best_match}\n\nQuestion: {question}\nAnswer:",
+        prompt=f"Context: {best_match}\n\nQuestion: {question}\nAnswer: ",
         max_tokens=200,
         temperature=0.7
     )
