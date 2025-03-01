@@ -1,11 +1,11 @@
 import React from "react";
 import "./index.css"; // Ensure Tailwind is imported
-import AuthCard from "./component/login";
+import LocalGovernmentDashboard from "./Components/Home Page/home";
 
 function App() {
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-200">
-      <AuthCard />
+    <div>
+      <LocalGovernmentDashboard />
     </div>
   );
 }

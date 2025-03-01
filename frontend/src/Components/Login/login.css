@@ -1,0 +1,171 @@
+.auth-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .auth-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    width: 100%;
+    max-width: 480px;
+    overflow: hidden;
+  }
+  
+  .auth-tabs {
+    display: flex;
+    position: relative;
+    border-bottom: 1px solid #eaeaea;
+  }
+  
+  .tab-button {
+    flex: 1;
+    padding: 16px;
+    background: none;
+    border: none;
+    font-size: 18px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .tab-button.active {
+    color: #1a1a1a;
+    border-bottom: 2px solid #1a1a1a;
+  }
+  
+  .tab-button:not(.active) {
+    color: #757575;
+  }
+  
+  .tab-button:hover:not(.active) {
+    background-color: #f5f5f5;
+  }
+  
+  .close-button {
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+    color: #757575;
+  }
+  
+  .close-button:hover {
+    color: #1a1a1a;
+  }
+  
+  .auth-content {
+    padding: 24px;
+  }
+  
+  .form-group {
+    margin-bottom: 16px;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: #1a1a1a;
+  }
+  
+  .form-group input,
+  .form-group select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #d1d1d1;
+    border-radius: 4px;
+    font-size: 16px;
+  }
+  
+  .form-group input:focus,
+  .form-group select:focus {
+    outline: none;
+    border-color: #1a1a1a;
+    box-shadow: 0 0 0 2px rgba(26, 26, 26, 0.1);
+  }
+  
+  .forgot-password {
+    text-align: right;
+    margin-bottom: 16px;
+  }
+  
+  .forgot-password a {
+    color: #1a1a1a;
+    text-decoration: none;
+    font-size: 14px;
+  }
+  
+  .forgot-password a:hover {
+    text-decoration: underline;
+  }
+  
+  .submit-button {
+    width: 100%;
+    padding: 14px;
+    background-color: #1a1a1a;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .submit-button:hover {
+    background-color: #333;
+  }
+  
+  .social-logins {
+    margin-top: 24px;
+  }
+  
+  .social-button {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 12px;
+    background-color: white;
+    border: 1px solid #d1d1d1;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .social-button:hover {
+    background-color: #f5f5f5;
+  }
+  
+  .social-button .icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    margin-right: 8px;
+    font-weight: bold;
+  }
+  
+  .social-button.google .icon {
+    color: #4285F4;
+  }
+  
+  .social-button.aadhaar .icon {
+    color: #FF5722;
+  }
