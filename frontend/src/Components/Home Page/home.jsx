@@ -1,9 +1,16 @@
-import React from "react";
+import React,{useState} from "react";
 import { useNavigate } from "react-router-dom";
+import ChatbotButton from "../ChatBot/ChatbotButton";
+import ChatbotUI from "../ChatBot/ChatbotUI";
+
 
 const LocalGovernmentDashboard = () => {
   const navigate = useNavigate();
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
+  const toggleChat = () => {
+    setIsChatOpen(!isChatOpen);
+  };
   const recentPolicies = [
     { id: 1, title: "Budget 2025", date: "Feb 25, 2025", category: "Environment", pdfUrl: "/pdfs/1.pdf" },
     { id: 2, title: "Local Business Tax Incentive Program", date: "Feb 20, 2025", category: "Economy", pdfUrl: "/pdfs/2.pdf" },
@@ -17,6 +24,9 @@ const LocalGovernmentDashboard = () => {
     navigate(`/policy/${policy.id}`, { state: { pdfUrl: policy.pdfUrl } });  // ✅ Pass pdfUrl properly
   };
 
+  const handleComplaintClick = () => {
+    navigate(`/complaints`);
+  };
   return (
     <div className="min-h-screen bg-gray-100">
       <nav className="bg-gray-800 text-white">
@@ -104,6 +114,8 @@ const LocalGovernmentDashboard = () => {
             ))}
           </div>
         </div>
+        <ChatbotButton onClick={toggleChat} isOpen={isChatOpen} />
+        <ChatbotUI isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
       </main>
     </div>
   );
