@@ -19,7 +19,9 @@ const PolicyDetails = () => {
   const [activeTab, setActiveTab] = useState("summary");
   const [keyPoints, setKeyPoints] = useState([]);
   const [copied, setCopied] = useState(false);
-
+  const handleComplaintClick = () => {
+    navigate(`/complaints`);
+  };
   // Simulate progress during loading
   useEffect(() => {
     let interval;
@@ -80,7 +82,7 @@ const PolicyDetails = () => {
       setLoadingProgress(100);
       setTimeout(() => setLoadingProgress(0), 600);
     }
-  };
+  }; 
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(summary);

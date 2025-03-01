@@ -17,6 +17,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import LocalGovernmentDashboard from "./Components/Home Page/home";
 import ComplaintsPage from "./Components/Complaint/ComplaintsPage";
 import MyComplaintsPage from "./Components/Complaint/MyComplaintsPage";
+import PolicyDetails from "./Components/Home Page/PolicyDetails";
 
 function App() {
   return (
@@ -25,7 +26,7 @@ function App() {
         <Route path="/" element={<LocalGovernmentDashboard />} />
         <Route path="/complaints" element={<ComplaintsPage />} />
         <Route path="/my-complaints" element={<MyComplaintsPage />} />
-        <Route path="/policy/:id" element={<div>Policy details page (to be implemented)</div>} />
+        <Route path="/policy/:id" element={<PolicyDetails/>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
