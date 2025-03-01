@@ -5,20 +5,23 @@ const LocalGovernmentDashboard = () => {
   const navigate = useNavigate();
 
   const recentPolicies = [
-    { id: 1, title: "Budget 2025", date: "Feb 25, 2025", category: "Environment", pdfUrl: "/pdfs/1.pdf" },
-    { id: 2, title: "Local Business Tax Incentive Program", date: "Feb 20, 2025", category: "Economy", pdfUrl: "/pdfs/2.pdf" },
-    { id: 3, title: "Public Park Renovation Guidelines", date: "Feb 15, 2025", category: "Urban Development", pdfUrl: "/pdfs/3.pdf" },
-    { id: 4, title: "Neighborhood Traffic Calming Measures", date: "Feb 10, 2025", category: "Transportation", pdfUrl: "/pdfs/budget1.pdf" },
-    { id: 5, title: "Community Solar Energy Initiative", date: "Feb 5, 2025", category: "Sustainability", pdfUrl: "/pdfs/solar_initiative.pdf" },
+    { id: 1, title: "Municipal Waste Management Update", date: "Feb 25, 2025", category: "Environment" },
+    { id: 2, title: "Local Business Tax Incentive Program", date: "Feb 20, 2025", category: "Economy" },
+    { id: 3, title: "Public Park Renovation Guidelines", date: "Feb 15, 2025", category: "Urban Development" },
+    { id: 4, title: "Neighborhood Traffic Calming Measures", date: "Feb 10, 2025", category: "Transportation" },
+    { id: 5, title: "Community Solar Energy Initiative", date: "Feb 5, 2025", category: "Sustainability" },
   ];
 
-  const handlePolicyClick = (policy) => {
-    console.log("Navigating to Policy Details with PDF:", policy.pdfUrl); // ✅ Debugging Step
-    navigate(`/policy/${policy.id}`, { state: { pdfUrl: policy.pdfUrl } });  // ✅ Pass pdfUrl properly
+  const handlePolicyClick = (id) => {
+    navigate(`/policy/${id}`);
+  };
+  const handleComplaintClick = () => {
+    navigate(`/complaints`);
   };
 
   return (
     <div className="min-h-screen bg-gray-100">
+      {/* Navigation Bar */}
       <nav className="bg-gray-800 text-white">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex justify-between h-16">
@@ -48,8 +51,11 @@ const LocalGovernmentDashboard = () => {
           </div>
         </div>
       </nav>
+
+      {/* Main Content */}
       <main className="max-w-7xl mx-auto py-6 p-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Upcoming Elections & Local Government Meetings */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-xl font-bold mb-4">Upcoming Elections</h2>
             <div className="text-center">
@@ -86,15 +92,13 @@ const LocalGovernmentDashboard = () => {
             </div>
           </div>
         </div>
+
+        {/* Recent Policies */}
         <div className="mt-6 bg-white rounded-lg shadow p-6">
           <h2 className="text-xl font-bold mb-4">Recent Policies</h2>
           <div className="space-y-2">
             {recentPolicies.map((policy) => (
-              <div
-                key={policy.id}
-                className="p-3 border border-gray-200 rounded-md hover:bg-gray-50 cursor-pointer"
-                onClick={() => handlePolicyClick(policy)}
-              >
+              <div key={policy.id} className="p-3 border border-gray-200 rounded-md hover:bg-gray-50 cursor-pointer" onClick={() => handlePolicyClick(policy.id)}>
                 <div className="font-medium">{policy.title}</div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">{policy.date}</span>
