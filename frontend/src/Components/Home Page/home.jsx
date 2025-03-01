@@ -2,13 +2,20 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import ChatbotButton from "../ChatBot/ChatbotButton";
 import ChatbotUI from "../ChatBot/ChatbotUI";
+import AuthCard from "../Login/login";
 
 const LocalGovernmentDashboard = () => {
   const navigate = useNavigate();
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [showGuide, setShowGuide] = useState(true);
   const [hasSeenGuide, setHasSeenGuide] = useState(false);
-
+  const [showAuth, setShowAuth] = useState(false);
+  const openAuthCard = () => {
+      setShowAuth(true);
+    };
+    const closeAuthCard = () => {
+      setShowAuth(false);
+    };
   useEffect(() => {
     // Check if user has seen the guide before
     const guideSeen = localStorage.getItem("policyGuideShown");
@@ -77,6 +84,15 @@ const LocalGovernmentDashboard = () => {
                 <button className="px-3 py-2 rounded-md text-sm font-medium bg-gray-900" onClick={() => handleComplaintClick()}>Complaints</button>
               </div>
             </div>
+            <div className="flex items-center">
+              <button
+                className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-sm font-medium"
+                onClick={openAuthCard}
+              >
+                Login
+              </button>
+            </div>
+            
             <div className="flex items-center">
               {hasSeenGuide && (
                 <button 
@@ -177,6 +193,8 @@ const LocalGovernmentDashboard = () => {
             ))}
           </div>
         </div>
+        {/* Authentication Card */}
+        {showAuth && <AuthCard onClose={closeAuthCard} />}
         <ChatbotButton onClick={toggleChat} isOpen={isChatOpen} />
         <ChatbotUI isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
       </main>

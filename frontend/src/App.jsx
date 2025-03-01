@@ -18,6 +18,8 @@ import LocalGovernmentDashboard from "./Components/Home Page/home";
 import ComplaintsPage from "./Components/Complaint/ComplaintsPage";
 import MyComplaintsPage from "./Components/Complaint/MyComplaintsPage";
 import PolicyDetails from "./Components/Home Page/PolicyDetails";
+import UserDashboard from "./Components/pages/UserDashboard";
+import GovernmentDashboard from "./Components/pages/GovernmentDashboad";
 
 function App() {
   return (
@@ -28,6 +30,8 @@ function App() {
         <Route path="/my-complaints" element={<MyComplaintsPage />} />
         <Route path="/policy/:id" element={<PolicyDetails/>} />
         <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="/user-dashboard" element={<UserDashboard />} />
+        <Route path="/government-dashboard" element={<GovernmentDashboard />} />
       </Routes>
     </Router>
   );
