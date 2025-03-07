@@ -60,7 +60,8 @@ const LocalGovernmentDashboard = () => {
     <div className="min-h-screen bg-gray-100">
       <nav className="bg-gray-800 text-white">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="flex justify-between h-16">
+          <div className="flex justify-between h-16 items-center">
+            {/* Left Side - Logo & Navigation */}
             <div className="flex items-center">
               <div className="flex-shrink-0 flex items-center">
                 <svg
@@ -77,27 +78,29 @@ const LocalGovernmentDashboard = () => {
                 </svg>
                 <span className="font-bold text-xl">CivicBridge</span>
               </div>
+
+              {/* Navigation Buttons */}
               <div className="ml-10 flex items-center space-x-2">
                 <button className="px-3 py-2 rounded-md text-sm font-medium bg-gray-900">Dashboard</button>
-              </div>
-              <div className="ml-10 flex items-center space-x-2">
-                <button className="px-3 py-2 rounded-md text-sm font-medium bg-gray-900" onClick={() => handleComplaintClick()}>Complaints</button>
+                <button className="px-3 py-2 rounded-md text-sm font-medium bg-gray-900" onClick={handleComplaintClick}>
+                  Complaints
+                </button>
               </div>
             </div>
-            <div className="flex items-center">
+
+            {/* Right Side - Login & Help Guide */}
+            <div className="ml-auto flex items-center">
               <button
                 className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-sm font-medium"
                 onClick={openAuthCard}
               >
                 Login
               </button>
-            </div>
-            
-            <div className="flex items-center">
+
               {hasSeenGuide && (
                 <button 
                   onClick={reOpenGuide} 
-                  className="flex items-center text-sm text-white bg-blue-600 px-3 py-2 rounded mr-2"
+                  className="flex items-center text-sm text-white bg-blue-600 px-3 py-2 rounded ml-4"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clipRule="evenodd" />
@@ -109,6 +112,7 @@ const LocalGovernmentDashboard = () => {
           </div>
         </div>
       </nav>
+
       <main className="max-w-7xl mx-auto py-6 p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-white rounded-lg shadow p-6">

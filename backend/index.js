@@ -77,7 +77,7 @@ const { check, validationResult } = require("express-validator");
 const User = require("./models/User");
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
 
 // Middleware
@@ -224,6 +224,70 @@ app.get("/", (req, res) => {
     res.send("✅ API is running...");
 });
 
+// Complaint Schema
+const complaintSchema = new mongoose.Schema({
+  title: String,
+  category: String,
+  state: String,
+  city: String,
+  location: String,
+  reportedDate: String,
+  status: { type: String, default: "Submitted" },
+  progressStage: { type: Number, default: 0 },
+  description: String,
+  images: [String], // Store image URLs or base64 strings
+});
+
+const Complaint = mongoose.model("Complaint", complaintSchema);
+
+// POST complaint
+app.post("/complaints", async (req, res) => {
+  try {
+    const newComplaint = new Complaint(req.body);
+    await newComplaint.save();
+    res.status(201).json({ message: "Complaint submitted successfully!" });
+  } catch (error) {
+    res.status(500).json({ error: "Error submitting complaint" });
+  }
+});
+
+// GET complaints
+app.get("/complaints", async (req, res) => {
+  try {
+    const complaints = await Complaint.find();
+    res.json(complaints);
+  } catch (error) {
+    res.status(500).json({ error: "Error retrieving complaints" });
+  }
+});
+
+app.post('/api/complaints/:id/comment', async (req, res) => {
+  const { comment } = req.body;
+  try {
+    const complaint = await Complaint.findById(req.params.id);
+    if (!complaint) return res.status(404).json({ message: "Complaint not found" });
+
+    complaint.comments.push({ text: comment, date: new Date() });
+    await complaint.save();
+    
+    res.json({ message: "Comment added", complaint });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+app.put('/api/complaints/:id/status', async (req, res) => {
+  const { status } = req.body;
+  try {
+    const complaint = await Complaint.findById(req.params.id);
+    if (!complaint) return res.status(404).json({ message: "Complaint not found" });
+
+    complaint.status = status;
+    await complaint.save();
+    res.json({ message: "Status updated", complaint });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 /* ==========================
    🔹 START SERVER
 ========================== */

@@ -25,26 +25,29 @@ const PolicyDetails = () => {
     navigate(`/complaints`);
   };
   const [isChatOpen, setIsChatOpen] = useState(false);
-const toggleChat =async () => {
+  const toggleChat = async () => {
     setIsChatOpen(!isChatOpen);
+  
     if (!pdfUrl) {
       setError("No policy document available.");
       return;
     }
+  
     const BASE_URL = "http://localhost:5173";  
     const fullPdfUrl = pdfUrl.startsWith("http") ? pdfUrl : `${BASE_URL}${pdfUrl}`;
-
+  
     console.log("📤 Sending request with PDF URL:", fullPdfUrl);
-
+  
     const formData = new FormData();
-    formData.append("pdf_url", fullPdfUrl);
-
-
+    formData.append("pdf_url", fullPdfUrl);  // Send the URL of the PDF
+  
     const response = await axios.post("http://127.0.0.1:5000/upload", formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
+    
     console.log(response.data);
   };
+  
   // Simulate progress during loading
   useEffect(() => {
     let interval;

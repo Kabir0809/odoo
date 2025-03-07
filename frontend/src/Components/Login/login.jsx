@@ -32,7 +32,7 @@ const AuthCard = ({ onClose }) => {
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/login", loginData);
+      const res = await axios.post("http://localhost:3000/api/auth/login", loginData);
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("role", res.data.user.role);
 
@@ -55,7 +55,7 @@ const AuthCard = ({ onClose }) => {
     }
 
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/signup", {
+      const res = await axios.post("http://localhost:3000/api/auth/signup", {
         name: signupData.fullName,
         email: signupData.email,
         password: signupData.password,
